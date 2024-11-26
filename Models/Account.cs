@@ -17,11 +17,5 @@ namespace VB_api.Models
         public string CurrencyType { get; set; } // FK
         [Required]
         public int AccountBalance { get; set; } 
-
-        [ForeignKey(nameof(CustomerID))]
-        public Customer Customer { get; set; } 
-
-        [ForeignKey(nameof(CurrencyType))]
-        public Currency Currency { get; set; }
     }
 }

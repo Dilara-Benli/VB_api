@@ -2,7 +2,7 @@
 
 namespace VB_api.Models
 {
-    public class AddUpdateAccount
+    public class AccountRequest
     {
         [Required]
         public long CustomerID { get; set; } 

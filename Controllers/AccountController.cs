@@ -20,7 +20,8 @@ namespace VB_api.Controllers
         [HttpGet]
         public async Task<IActionResult> DisplayAllAccounts()
         {
-            return Ok(await _dbContext.Account.ToListAsync());
+            var account = await _dbContext.Account.ToListAsync();
+            return Ok(new {account});
         }
 
         [HttpGet("{customerID}")]
@@ -29,20 +30,20 @@ namespace VB_api.Controllers
             var customer = await _dbContext.Customer.FindAsync(customerID);
             if (customer == null)
             {
-                return BadRequest("No customer found");
+                return NotFound(new { message = "Customer could not be found." });
             }
 
             var account = await _dbContext.Account.Where(x => x.CustomerID == customerID).ToListAsync();
-            return Ok(account);
+            return Ok(new {account});
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAccount([FromBody] AddUpdateAccount request)
+        public async Task<IActionResult> CreateAccount([FromBody] AccountRequest request)
         {
             var customer = await _dbContext.Customer.FindAsync(request.CustomerID);
             if (customer == null)
             {
-                return BadRequest("No customer found");
+                return NotFound(new { message = "Customer could not be found." });
             }
 
             var account = new Account()
@@ -56,29 +57,29 @@ namespace VB_api.Controllers
             await _dbContext.Account.AddAsync(account);
             await _dbContext.SaveChangesAsync();
 
-            return Ok(account);
+            return Ok(new {message = "Account Created", accountID = account.AccountID });
         }
 
         [HttpPut("{accountID}")]
-        public async Task<IActionResult> UpdateAccount(long accountID, AddUpdateAccount request)
+        public async Task<IActionResult> UpdateAccount(long accountID, AccountRequest request)
         {
             var customer = await _dbContext.Customer.FindAsync(request.CustomerID);
             var account = await _dbContext.Account.FindAsync(accountID);
 
             if (customer == null)
             {
-                return BadRequest("No customer found");
+                return NotFound(new { message = "Customer could not be found." });
             }
             if (account == null)
             {
-                return BadRequest("No account found");
+                return NotFound(new { message = "Account could not be found." });
             }
 
             account.CustomerID = request.CustomerID;
             account.AccountName = request.AccountName;
 
             await _dbContext.SaveChangesAsync();
-            return Ok(account);
+            return Ok(new {message = "Account Updated", accountID = account.AccountID});
         }
 
         [HttpDelete("{accountID}")]
@@ -88,12 +89,12 @@ namespace VB_api.Controllers
 
             if (account == null)
             {
-                return BadRequest("No account found");
+                return NotFound(new { message = "Account could not be found." });
             }
 
             _dbContext.Remove(account);
             await _dbContext.SaveChangesAsync();
-            return Ok(account);
+            return Ok(new {message = "Account Deleted", accountID = account.AccountID});
         }
     }
 }

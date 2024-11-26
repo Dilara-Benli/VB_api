@@ -13,9 +13,5 @@ namespace VB_api.Models
         public long SourceAccountID { get; set; }
         [Required]
         public long TargetAccountID { get; set; } 
-
-        [ForeignKey(nameof(TransactionID))]
-        public Transaction Transaction { get; set; } 
     }
-
 }

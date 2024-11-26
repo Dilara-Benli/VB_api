@@ -2,7 +2,7 @@
 
 namespace VB_api.Models
 {
-    public class DepositWithdraw
+    public class TransactionRequest
     {
         [Required]
         public long AccountID { get; set; }
@@ -13,6 +13,6 @@ namespace VB_api.Models
 
         [Required]
         [MaxLength(50)]
-        public string TransactionExplanation { get; set; } 
+        public string Explanation { get; set; } 
     }
 }

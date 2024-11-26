@@ -2,7 +2,7 @@
 
 namespace VB_api.Models
 {
-    public class AddUpdateCustomer
+    public class CustomerRequest
     {
         [Required]
         [MaxLength(50)]

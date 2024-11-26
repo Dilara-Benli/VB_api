@@ -19,7 +19,8 @@ namespace VB_api.Controllers
         [HttpGet]
         public async Task<IActionResult> DisplayAllCustomers() 
         {
-            return Ok(await _dbContext.Customer.ToListAsync());
+            var customer = await _dbContext.Customer.ToListAsync();
+            return Ok(new {customer});
         }
 
         [HttpGet("{customerID}")]
@@ -28,15 +29,21 @@ namespace VB_api.Controllers
             var customer = await _dbContext.Customer.FindAsync(customerID);
             if (customer == null)
             {
-                return BadRequest("No customer found");
+                return NotFound(new { message = "Customer could not be found." });
             }
 
-            return Ok(customer);
+            return Ok(new {customer});
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCustomer([FromBody] AddUpdateCustomer request) 
+        public async Task<IActionResult> CreateCustomer([FromBody] CustomerRequest request) 
         {
+            if (_dbContext.Customer.Any(c => c.CustomerIdentityNumber == request.CustomerIdentityNumber))
+            {
+                return Conflict(new { message = "Customer with the given identity number already exists." });
+                //return BadRequest(new { message = "There is not enough balance in the account." });
+            }
+
             var customer = new Customer()
             {
                 CustomerName = request.CustomerName,
@@ -48,17 +55,17 @@ namespace VB_api.Controllers
             await _dbContext.Customer.AddAsync(customer);
             await _dbContext.SaveChangesAsync();
 
-            return Ok(customer);
+            return Ok(new {message = "Customer Created", customerID = customer.CustomerID});
         }
 
         [HttpPut("{customerID}")]
-        public async Task<IActionResult> UpdateCustomer(long customerID, AddUpdateCustomer request)
+        public async Task<IActionResult> UpdateCustomer(long customerID, CustomerRequest request)
         {
             var customer = await _dbContext.Customer.FindAsync(customerID);
 
             if (customer == null)
             {
-                return BadRequest("No customer found");
+                return NotFound(new { message = "Customer could not be found." });
             }
 
             customer.CustomerName = request.CustomerName;
@@ -67,7 +74,7 @@ namespace VB_api.Controllers
             customer.CustomerIdentityNumber = request.CustomerIdentityNumber;
 
             await _dbContext.SaveChangesAsync();
-            return Ok(customer);
+            return Ok(new {message = "Customer Updated", customerID = customer.CustomerID});
         }
 
         [HttpDelete("{customerID}")]
@@ -77,12 +84,12 @@ namespace VB_api.Controllers
 
             if (customer == null)
             {
-                return BadRequest("No customer found");
+                return NotFound(new { message = "Customer could not be found." });
             }
 
             _dbContext.Remove(customer);
             await _dbContext.SaveChangesAsync();
-            return Ok(customer);
+            return Ok(new {message = "Customer Deleted", customerID = customer.CustomerID});
         }
     }
 }

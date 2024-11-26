@@ -19,13 +19,5 @@ namespace VB_api.Models
         [Required]
         [MaxLength(50)]
         public string TransactionExplanation { get; set; } 
-
-        [ForeignKey(nameof(AccountID))]
-        public Account Account { get; set; }
-
-        [ForeignKey(nameof(TransactionTypeName))]
-        public TransactionType TransactionType { get; set; }
-
-        //public Transfer Transfer { get; set; }
     }
 }
